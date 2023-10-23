@@ -1,0 +1,30 @@
+name: Update submodule Pull Request
+on:
+  repository_dispatch:
+    types: [update-test]
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "*" >> ./README.md
+
+      - name: Generate GitHub Apps token
+        id: generate
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+          
+      - name: Create Pull Request 
+        id: cpr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: Update submodule.
+          labels: Auto PR
+          branch: auto-pr/update-submodule 
+          branch-suffix : timestamp 
+          commit-message: auto update submodule
+          base : main
+          delete-branch: true
+          token: ${{ steps.generate.outputs.token }}
